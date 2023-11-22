@@ -36,3 +36,5 @@ command! -range Translate lua require("translate-with-gpt").translate()<CR>
 - [ ] vim 対応
 
 - [ ] Windows 対応
+
+- [ ] モデルの変更ができるようにする
