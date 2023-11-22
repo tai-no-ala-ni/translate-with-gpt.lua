@@ -98,7 +98,7 @@ translateWithGpt.sendSelectedText = function(text, apiKey)
 		.. body
 		.. "'"
 		.. " | jq .choices[0].message.content"
-	print("curl_command: " .. curl_command)
+	--print("curl_command: " .. curl_command)
 
 	local result = execute_cmd(curl_command)
 	return result
