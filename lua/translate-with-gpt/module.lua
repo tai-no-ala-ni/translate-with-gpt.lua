@@ -1,6 +1,3 @@
-local http = require("socket.http")
-local ltn12 = require("ltn12")
-local cjson = require("cjson")
 local translateWithGpt = {}
 
 -- get selected text from vim visual mode
@@ -15,15 +12,6 @@ translateWithGpt.getSelectedText = function()
 	lines[1] = string.sub(lines[1], char_start)
 	lines[#lines] = string.sub(lines[#lines], 1, char_end)
 	local text = table.concat(lines, "\n")
-
-	--print(string.format("vstart: %s", vim.inspect(vstart)))
-	--print(string.format("vend: %s", vim.inspect(vend)))
-	--print(string.format("line_start: %s", vim.inspect(line_start)))
-	--print(string.format("line_end: %s", vim.inspect(line_end)))
-	--print(string.format("char_start: %s", vim.inspect(char_start)))
-	--print(string.format("char_end: %s", vim.inspect(char_end)))
-
-	-- print(string.format("lines: %s", vim.inspect(text)))
 	return text
 end
 
@@ -94,28 +82,11 @@ translateWithGpt.sendSelectedText = function(text, apiKey)
 		model = "gpt-3.5-turbo",
 		messages = { { role = "user", content = "以下の文章を日本語に翻訳してください\n" .. text } },
 	}
-	--local body = cjson.encode(payload)
-	--local body = setmetatable(payload, cjson.array_mt)
-	local body = cjson.encode(payload)
 	local url = "https://api.openai.com/v1/chat/completions"
-
-	-- local result, statusCode, message, headers = http.request({
-	-- 	method = "POST",
-	-- 	url = url,
-	-- 	source = ltn12.source.string(body),
-	-- 	headers = {
-	-- 		--["Host"] = require("socket.url").parse("https://api.openai.com/v1").host,
-	-- 		["Accept"] = "application/json",
-	-- 		["Content-Type"] = "application/json",
-	-- 		--["Content-Length"] = tostring(#body),
-	-- 		["Authorization"] = "Bearer " .. apiKey,
-	-- 	},
-	-- 	sink = ltn12.sink.table(respbody),
-	-- })
-	-- print("result: " .. vim.inspectresult))
-	-- print("message: " .. vim.inspect(message))
-	-- print("statusCode: " .. vim.inspect(statusCode))
-	-- print("headers: " .. vim.inspect(headers))
+	local body = '{"model":"gpt-3.5-turbo","messages":[{"content":"'
+		.. "次の文章を日本語に翻訳してください: "
+		.. text
+		.. '","role":"user"}]}'
 
 	local curl_command = "curl -s "
 		.. url
@@ -126,27 +97,11 @@ translateWithGpt.sendSelectedText = function(text, apiKey)
 		.. " -d '"
 		.. body
 		.. "'"
+		.. " | jq .choices[0].message.content"
+	print("curl_command: " .. curl_command)
 
 	local result = execute_cmd(curl_command)
-
-	--print("curl_command: " .. curl_command)
-	--print("result: " .. result)
-
-	result = cjson.decode(result)
-	result = result.choices[1].message.content
-
-	--print("result: " .. vim.inspect(result))
 	return result
-
-	--if result and statusCode == 200 then
-	--	local respbody = table.concat(respbody)
-	--	pcall(function()
-	--		respbody = cjson.decode(respbody)
-	--	end)
-	--	print("respbody: " .. vim.inspect(respbody))
-	--else
-	--	print("error: " .. vim.inspect(respbody))
-	--end
 end
 
 return translateWithGpt
