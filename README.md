@@ -1,3 +1,7 @@
+# [translate-with-gpt-denops](https://github.com/tai-no-ala-ni/translate-with-gpt-denops)に移行
+
+<details><summary>以前の説明</summary>
+
 # translate-with-gpt.lua
 
 - Neovim 内でテキストを選択して`:Translate`
@@ -38,3 +42,5 @@ command! -range Translate lua require("translate-with-gpt").translate()<CR>
 - [ ] Windows 対応
 
 - [ ] モデルの変更ができるようにする
+
+</details>
